@@ -401,10 +401,14 @@
         }
 
         async function downloadFileBlob(fileId) {
-            const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-            const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-            if (!resp.ok) throw new Error("Impossibile scaricare il file");
-            return await resp.blob();
+          if (!fileId) throw new Error("ID file mancante");
+          const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`;
+          const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (!resp.ok) {
+            const t = await resp.text();
+            throw new Error(`Impossibile scaricare il file (${resp.status}): ${t}`);
+          }
+          return await resp.blob();
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -497,4 +501,5 @@
 </body>
 
 </html>
+
 
